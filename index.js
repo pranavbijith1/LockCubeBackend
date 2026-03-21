@@ -11,7 +11,7 @@ app.get("/", (req, res) => {
 });
 
 const gameRoutes = require("./routes/game");
-app.use("/games", gameRoutes);
+app.use("/game", gameRoutes);
 
 app.listen(5001, () => {
   console.log(`Server running on port ${5001}`);
