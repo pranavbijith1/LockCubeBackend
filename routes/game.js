@@ -13,7 +13,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 router.get("/doomscrolldetect", async (req, res) => {
   try {
     const result = await model.generateContent(
-      "Create a unique and different angry dialogue towards a user who is doomscrolling instead of working productively"
+      "Create a casually roasting (not too mean, but not too nice yk find a balance and include cringe puns) dialogue towards a user who is doomscrolling instead of working productively"
     );
     const text = result.response.text();
 
