@@ -24,7 +24,8 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "multer": "^2.1.1",
-    "nodeom": "^0.0.1"
+    "nodeom": "^0.0.1",
+    "sound-play": "^1.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

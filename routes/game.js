@@ -9,6 +9,7 @@ const path = require("path");
 const sound = require("sound-play");
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { AsyncLocalStorage } = require("async_hooks");
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
@@ -16,14 +17,18 @@ let currentAudioProcess = null;
 
 let timeLeft = 0; 
 
-
+let gameStoppedAt = null;
 router.get("/doomscrolldetect", async (req, res) => {
   try {
-    const stopTime = localStorage.getItem('gameStoppedAt');
+    // const stopTime = AsyncLocalStorage.getItem('gameStoppedAt');
+  console.log("WE are DOOMSCroLLING")
     const currentTime = Date.now();
-
-    if(currentTime - stopTime < 30000){
-        const filePath = path.join(__dirname, "file.mp3");
+    if(gameStoppedAt) {
+        console.log(currentTime - gameStoppedAt);
+    }
+    if(gameStoppedAt && currentTime - gameStoppedAt < 30000){
+        console.log("Fahhhhh");;
+        const filePath = path.resolve(__dirname, "..", "fah.mp3");
 
         // Play the audio file with an optional volume argument (0.5 is default)
         const volume = 0.5;
@@ -36,9 +41,12 @@ router.get("/doomscrolldetect", async (req, res) => {
         });
 
         res.status(200).json({ message: "bad boy" });
-    }
-   
-    const elevenRes = await fetch(
+    } else {
+            const result = await model.generateContent(
+            "Roast the user for doomscrolling instead of being productive using brainrot langauge.  Mate it three sentences or less"
+            );
+            const text = result.response.text();
+        const elevenRes = await fetch(
     "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM",
     {
         method: "POST",
@@ -63,6 +71,9 @@ router.get("/doomscrolldetect", async (req, res) => {
     else currentAudioProcess = exec("mpg123 output.mp3");                                      // Linux
 
     res.status(200).json({ message: text });
+    }
+   
+    
 
   } catch (err) {
     console.log(err);
@@ -80,8 +91,11 @@ router.get("/start", async(req, res) => {
 });
 
 router.get("/stop", async(req, res) => {
-    localStorage.setItem('gameStoppedAt', Date.now());
+    console.log("STOP");
+    gameStoppedAt = Date.now();
     console.log("Game stopped. Timer started...");
+
+
 });
 
 module.exports = router;
