@@ -1,10 +1,15 @@
+// @ts-check
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { stripIndents } from "common-tags";
 import path from "path";
 import fs from "fs/promises";
 import { intlFormatDistance } from "date-fns";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const googleApiKey = process.env.GOOGLE_API_KEY;
+if (!googleApiKey) throw new Error("No Google API key!");
+
+const genAI = new GoogleGenerativeAI(googleApiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 /**
@@ -41,7 +46,7 @@ export class ElevenLabs {
         - ${totalDoomscrolls != 0 ? `This user has doomscrolled ${totalDoomscrolls} times.` : "This is the user's first doomscroll of this study session."}
         ${lastDoomscrollSession ? `- The user's last doomscroll session was ${lastDoomscrollFmt}.` : ""}
         - The user has wasted ${secondsWasted} total seconds.
-        - In this specific session, the user has spent ${(Date.now() - doomscrollStarted) / 1000} seconds doomscrolling.
+        - In this specific session, the user has spent ${(Date.now() - doomscrollStarted.getTime()) / 1000} seconds doomscrolling.
 
         If the user just started, you can be a little nicer, but if the user has been doomscrolling for a while, then be a little more harsh.
         Never encourage the user to doomscroll. If they just started (i.e. just a few seconds), then tell them off! They were doing good until now!

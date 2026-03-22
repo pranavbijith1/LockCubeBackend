@@ -1,3 +1,5 @@
+// @ts-check
+
 import express from "express";
 import { Announcer } from "../services/Announcer.js";
 

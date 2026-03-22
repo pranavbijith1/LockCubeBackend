@@ -1,17 +1,23 @@
-import { exec, spawn } from "child_process";
-import { ElevenLabs } from "./ElevenLabs.js";
+// @ts-check
 
+import { spawn } from "child_process";
+import { ElevenLabs } from "./ElevenLabs.js";
+import { ViewManager } from "./ViewManager.js";
+import path from "path";
+
+/** @enum {string} */
 const AnnouncerStates = {
-  Idle: "idle",
-  Generating: "generating",
-  TTSPlaying: "ttsplaying",
-  SirenPlaying: "siren-playing",
-  GamePlaying: "game-playing",
+  Idle: "Idle",
+  Generating: "Generating",
+  TTSPlaying: "TTSPlaying",
+  SirenPlaying: "SirenPlaying",
+  GamePlaying: "GamePlaying",
 };
 
-const DoomscrollStates = {
-  Doomscroll: "doomscroll-detected",
-  NoDoomscroll: "doomscroll-not-detected",
+/** @enum {string} */
+const DoomscrollStates = /** @type {const} */ {
+  Doomscroll: "Doomscroll",
+  NoDoomscroll: "NoDoomscroll",
 };
 
 export class Announcer {
@@ -25,12 +31,12 @@ export class Announcer {
   #lastDoomscroll = null;
 
   /**
-   * @type {keyof AnnouncerStates}
+   * @type {AnnouncerStates}
    */
   #announcerState = AnnouncerStates.Idle;
 
   /**
-   * @type {keyof DoomscrollStates}
+   * @type {DoomscrollStates}
    */
   #doomscrollState = DoomscrollStates.NoDoomscroll;
 
@@ -56,8 +62,20 @@ export class Announcer {
 
       // if currently idle, move over to generate
       if (this.#announcerState === AnnouncerStates.Idle) {
+        // if < 1 minute since last doomscroll, play FAH
+        if (
+          this.#lastDoomscroll != null &&
+          Date.now() - this.#lastDoomscroll.getTime() < 60 * 1000
+        ) {
+          this.#announcerState = AnnouncerStates.SirenPlaying;
+          await this.#startAudio(path.join(process.cwd(), "fah.mp3")).catch(
+            (err) => console.log("fah failed: ", err),
+          );
+        }
+
         this.#announcerState = AnnouncerStates.Generating;
         this.#startGenerating();
+        ViewManager.showGame();
       }
     }
   }
@@ -69,6 +87,7 @@ export class Announcer {
       this.#totalDoomscrollMS += Date.now() - this.#doomscrollStarted.getTime();
       this.#announcerState = AnnouncerStates.Idle;
       this.#stopPlaying();
+      ViewManager.showIdle();
     }
   }
 
@@ -130,8 +149,11 @@ export class Announcer {
         break;
 
       case "linux":
-        this.#audioProcess = spawn("ffplay", [path]);
+        this.#audioProcess = spawn("ffplay", ["-nodisp", "-autoexit", path]);
         break;
+
+      default:
+        throw new Error("Unsupported audio platform");
     }
 
     this.#audioProcess.stdout.pipe(process.stdout);
@@ -141,6 +163,7 @@ export class Announcer {
         console.log("Play failed! Exit: " + code);
       }
 
+      console.log("playback finished");
       this.#announcerState = AnnouncerStates.Idle;
       if (!this.#nextInterval)
         this.#nextInterval = setTimeout(
