@@ -83,10 +83,9 @@ export class Announcer {
   async userIsNotDoomscrolling() {
     if (this.#doomscrollState === DoomscrollStates.Doomscroll) {
       this.#doomscrollState = DoomscrollStates.NoDoomscroll;
-      this.#lastDoomscroll = Date.now();
+      this.#lastDoomscroll = new Date();
       this.#totalDoomscrollMS += Date.now() - this.#doomscrollStarted.getTime();
-      this.#announcerState = AnnouncerStates.Idle;
-      this.#stopPlaying();
+      // this.#announcerState = AnnouncerStates.Idle;
       ViewManager.showIdle();
     }
   }
