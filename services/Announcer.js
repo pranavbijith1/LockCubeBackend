@@ -67,6 +67,7 @@ export class Announcer {
       this.#doomscrollState = DoomscrollStates.NoDoomscroll;
       this.#lastDoomscroll = Date.now();
       this.#totalDoomscrollMS += Date.now() - this.#doomscrollStarted.getTime();
+      this.#announcerState = AnnouncerStates.Idle;
       this.#stopPlaying();
     }
   }
@@ -74,7 +75,7 @@ export class Announcer {
   async userGaming() {
     this.#stopPlaying();
     this.#announcerState = AnnouncerStates.GamePlaying;
-    this.#nextInterval && clearInterval(this.#nextInterval);
+    this.#nextInterval && clearTimeout(this.#nextInterval);
   }
 
   async userNotGaming() {
@@ -95,7 +96,7 @@ export class Announcer {
   }
 
   async #startGenerating() {
-    const dt = Date.now() - this.#doomscrollStarted;
+    const dt = Date.now() - this.#doomscrollStarted.getTime();
 
     const res = await ElevenLabs.generateAudioFullPipeline({
       doomscrollStarted: this.#doomscrollStarted,
@@ -107,6 +108,8 @@ export class Announcer {
     if (this.#doomscrollState == DoomscrollStates.Doomscroll) {
       this.#announcerState = AnnouncerStates.TTSPlaying;
       this.#startAudio(res);
+    } else {
+      this.#announcerState = AnnouncerStates.Idle;
     }
   }
 
