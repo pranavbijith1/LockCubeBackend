@@ -18,7 +18,7 @@ function switchToProgramWorkspace(appId) {
 }
 
 export class ViewManager {
-  static GAME_APP_NAME = "steam";
+  static GAME_APP_NAME = "HackDukeMiniGame";
   static IDLE_APP_NAME = "title:gardens.jpg";
 
   static async showGame() {
