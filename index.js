@@ -1,16 +1,17 @@
-const express = require("express");
-const cors = require("cors");
-const app = express(); 
+import "dotenv/config";
 
-app.use(cors());
+import express from "express";
+import cors from "cors";
 
-app.use(express.json());
+const app = express().use(cors()).use(express.json());
 
-app.get("/", (req, res) => {
+// routes
+import gameRoutes from "./routes/game.js";
+
+app.get("/", (_req, res) => {
   res.send("This is a server");
 });
 
-const gameRoutes = require("./routes/game");
 app.use("/game", gameRoutes);
 
 app.listen(5001, () => {

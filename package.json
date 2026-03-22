@@ -13,18 +13,22 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/pranavbijith1/LockCubeBackend/issues"
   },
   "homepage": "https://github.com/pranavbijith1/LockCubeBackend#readme",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@js-temporal/polyfill": "^0.5.1",
+    "common-tags": "^1.8.2",
     "cors": "^2.8.6",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "multer": "^2.1.1",
     "nodeom": "^0.0.1",
+    "relative-time": "^2.2.1",
     "sound-play": "^1.1.0"
   },
   "devDependencies": {
